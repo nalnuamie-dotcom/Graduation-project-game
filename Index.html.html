@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Our Sun... Our Health</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1E2A2F;
+    --paper:#FBF3DE;
+    --surface:#FFFFFF;
+    --amber:#F2A93C;
+    --amber-dark:#8F5F26;
+    --sage:#4C6B62;
+    --coral:#E8637A;
+    --sky:#5FB8D6;
+    --line:#E9DDBE;
+    --danger:#A3402F;
+    --success:#3F8F5F;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'IBM Plex Sans', sans-serif;
+    background:var(--paper);
+    color:var(--ink);
+    overflow-x:hidden;
+  }
+  h1,h2,h3{font-family:'Fraunces', serif; font-weight:500; margin:0;}
+  section{scroll-margin-top:24px;}
+
+  .site-header{
+    padding:20px 48px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    position:sticky;
+    top:0;
+    background:rgba(251,243,222,0.9);
+    backdrop-filter:blur(6px);
+    z-index:30;
+  }
+  .site-header .mark{font-size:19px; letter-spacing:0.2px;}
+  .site-header nav{display:flex; gap:26px; font-size:14px;}
+  .site-header nav a{color:var(--sage); font-weight:500; text-decoration:none; cursor:pointer;}
+  .site-header nav a:hover{color:var(--ink);}
+
+  .hero{position:relative; text-align:center; padding:44px 24px 70px; overflow:hidden;}
+  .hero .sun{
+    width:170px; height:170px; border-radius:50%;
+    background:radial-gradient(circle at 38% 32%, #FFE9B8, var(--amber) 70%);
+    margin:0 auto 14px; position:relative;
+    box-shadow:0 0 0 14px rgba(242,169,60,0.16), 0 0 0 28px rgba(242,169,60,0.08);
+  }
+  .hero .sun::before, .hero .sun::after{content:""; position:absolute; inset:-34px; border-radius:50%; border:3px dashed rgba(242,169,60,0.35);}
+  .hero .sun::after{inset:-58px; border-color:rgba(232,99,122,0.18);}
+  .hero h1{font-size:42px; line-height:1.12; margin:0 auto 14px; max-width:14ch;}
+  .hero p.lede{font-size:17px; line-height:1.6; color:#3E4A4E; max-width:46ch; margin:0 auto;}
+  .hero .cta-row{display:flex; justify-content:center; gap:12px; margin-top:26px; flex-wrap:wrap;}
+  .hero .cta-row a{
+    font-size:14px; font-weight:500; padding:11px 20px; border-radius:100px;
+    text-decoration:none; cursor:pointer;
+  }
+  .hero .cta-row a.primary{background:var(--ink); color:var(--surface);}
+  .hero .cta-row a.secondary{background:var(--surface); color:var(--ink); border:1px solid var(--line);}
+
+  .stats{max-width:820px; margin:0 auto; padding:0 24px 56px; display:grid; grid-template-columns:repeat(3,1fr); gap:16px;}
+  .stats .card{background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:22px 16px; text-align:center;}
+  .stats .card .icon{font-size:26px;}
+  .stats .card .big{font-family:'Fraunces', serif; font-size:24px; margin:8px 0 2px;}
+  .stats .card .label{font-size:13px; color:var(--sage);}
+
+  .section-wrap{max-width:820px; margin:0 auto 72px; padding:0 24px;}
+  .section-head{text-align:center; margin-bottom:24px;}
+  .section-head h2{font-size:28px; margin-bottom:8px;}
+  .section-head p{font-size:15px; color:var(--sage); margin:0;}
+
+  /* ---- quiz ---- */
+  .quiz-card{background:var(--surface); border:1px solid var(--line); border-radius:20px; padding:32px; text-align:center;}
+  .quiz-progress{font-size:13px; color:var(--sage); margin-bottom:10px;}
+  .quiz-question{font-size:19px; font-weight:500; margin-bottom:22px; line-height:1.4;}
+  .quiz-options{display:grid; gap:10px; text-align:left;}
+  .quiz-options button{
+    font-family:'IBM Plex Sans', sans-serif; font-size:15px; padding:13px 16px;
+    border:1px solid var(--line); background:#fff; border-radius:12px; cursor:pointer; color:var(--ink);
+  }
+  .quiz-options button:hover{border-color:var(--amber);}
+  .quiz-options button.correct{background:#E7F4EB; border-color:var(--success); color:var(--success);}
+  .quiz-options button.incorrect{background:#FBEAE7; border-color:var(--danger); color:var(--danger);}
+  .quiz-options button:disabled{cursor:default;}
+  .quiz-next{margin-top:20px; font-size:14px; font-weight:500; padding:10px 22px; border-radius:100px; background:var(--ink); color:#fff; border:none; cursor:pointer;}
+  .quiz-result{font-size:20px; margin-bottom:8px;}
+  .quiz-best{font-size:13px; color:var(--sage); margin-bottom:20px;}
+  .quiz-start{font-size:14px; font-weight:500; padding:11px 24px; border-radius:100px; background:var(--coral); color:#fff; border:none; cursor:pointer;}
+
+  /* ---- dice ---- */
+  .dice-wrap{display:flex; flex-direction:column; align-items:center; gap:20px;}
+  .die{
+    width:110px; height:110px; background:var(--surface); border:1px solid var(--line); border-radius:20px;
+    display:grid; grid-template-columns:repeat(3,1fr); grid-template-rows:repeat(3,1fr);
+    padding:16px; box-shadow:0 6px 0 var(--line);
+    transition:transform 120ms ease;
+  }
+  .die.rolling{animation:shake 100ms linear infinite;}
+  @keyframes shake{
+    0%{transform:rotate(0deg);} 25%{transform:rotate(-6deg);} 75%{transform:rotate(6deg);} 100%{transform:rotate(0deg);}
+  }
+  .die .pip{width:16px; height:16px; border-radius:50%; background:var(--ink); justify-self:center; align-self:center; opacity:0;}
+  .roll-btn{font-size:15px; font-weight:500; padding:13px 28px; border-radius:100px; background:var(--sky); color:#04333F; border:none; cursor:pointer;}
+  .roll-btn:disabled{background:var(--line); color:#8a8a86; cursor:default;}
+  .dice-result{font-size:15px; color:var(--sage);}
+  .dice-question{
+    width:100%; max-width:420px; background:var(--surface); border:1px solid var(--line); border-radius:16px;
+    padding:20px; text-align:left;
+  }
+  .dice-question .dq-text{font-size:15px; font-weight:500; margin-bottom:14px;}
+  .dice-question .dq-options{display:grid; gap:8px;}
+  .dice-question .dq-options button{
+    font-family:'IBM Plex Sans', sans-serif; font-size:14px; padding:10px 12px; border-radius:10px;
+    border:1px solid var(--line); background:#fff; cursor:pointer; text-align:left; color:var(--ink);
+  }
+  .dice-question .dq-options button.correct{background:#E7F4EB; border-color:var(--success); color:var(--success);}
+  .dice-question .dq-options button.incorrect{background:#FBEAE7; border-color:var(--danger); color:var(--danger);}
+  .dice-question .dq-options button:disabled{cursor:default;}
+  .dice-question .dq-feedback{margin-top:12px; font-size:14px; font-weight:500;}
+  .dice-question .dq-feedback.good{color:var(--success);}
+  .dice-question .dq-feedback.bad{color:var(--danger);}
+  .roll-history{display:flex; gap:8px; flex-wrap:wrap; justify-content:center; max-width:320px;}
+  .roll-history span{
+    width:28px; height:28px; border-radius:8px; background:var(--surface); border:1px solid var(--line);
+    display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:500; color:var(--sage);
+  }
+
+  /* ---- chat launcher ---- */
+  .launcher{position:fixed; right:28px; bottom:28px; width:56px; height:56px; border-radius:50%; background:var(--ink); color:var(--surface); border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:22px; z-index:40;}
+  .launcher:hover{background:#0F1719;}
+  .panel{
+    position:fixed; right:28px; bottom:96px; width:360px; max-width:calc(100vw - 40px); height:480px; max-height:calc(100vh - 140px);
+    background:var(--surface); border:1px solid var(--ink); display:flex; flex-direction:column;
+    transform:translateY(16px); opacity:0; pointer-events:none; transition:transform 160ms ease, opacity 160ms ease; z-index:41; border-radius:16px; overflow:hidden;
+  }
+  .panel.open{transform:translateY(0); opacity:1; pointer-events:auto;}
+  .panel-head{padding:16px 18px; border-bottom:1px solid var(--line); display:flex; align-items:center; justify-content:space-between; background:#FDEBD3;}
+  .panel-head .title{font-family:'Fraunces', serif; font-size:16px;}
+  .panel-head .sub{font-size:12px; color:var(--sage); margin-top:2px;}
+  .panel-close{background:none; border:none; font-size:18px; cursor:pointer; color:var(--ink); line-height:1; padding:4px;}
+  .messages{flex:1; overflow-y:auto; padding:16px 18px; display:flex; flex-direction:column; gap:14px;}
+  .msg{font-size:14px; line-height:1.5; max-width:88%;}
+  .msg.user{align-self:flex-end; background:var(--ink); color:var(--surface); padding:9px 12px; border-radius:10px;}
+  .msg.bot{align-self:flex-start; border-left:2px solid var(--amber); padding:2px 0 2px 10px;}
+  .msg.bot.pending{color:var(--sage); font-style:italic;}
+  .msg.error{align-self:flex-start; border-left:2px solid var(--danger); padding:2px 0 2px 10px; color:var(--danger);}
+  .empty-hint{font-size:13px; color:var(--sage); padding:2px 0;}
+  .suggestions{display:flex; flex-wrap:wrap; gap:8px; padding:2px 18px 12px; border-top:1px solid var(--line);}
+  .suggestions:empty{display:none; padding:0; border-top:none;}
+  .chip{font-family:'IBM Plex Sans', sans-serif; font-size:12.5px; line-height:1.3; padding:8px 12px; border-radius:100px; border:1px solid var(--line); background:#fff; color:var(--ink); cursor:pointer; text-align:left;}
+  .chip:hover{border-color:var(--amber); background:#FFF8EA;}
+  .chip.link-chip{background:var(--coral); color:#fff; border-color:var(--coral); font-weight:500;}
+  .chip.link-chip:hover{background:#d1546a;}
+  .panel-input{border-top:1px solid var(--line); padding:12px; display:flex; gap:8px;}
+  .panel-input input{flex:1; border:1px solid var(--line); padding:9px 10px; font-family:'IBM Plex Sans', sans-serif; font-size:14px; background:#fff; color:var(--ink); border-radius:8px;}
+  .panel-input input:focus{outline:1px solid var(--amber);}
+  .panel-input button{background:var(--amber); color:#2A1B0A; border:none; font-weight:500; font-size:14px; padding:0 16px; cursor:pointer; border-radius:8px;}
+  .panel-input button:disabled{background:var(--line); color:#8a8a86; cursor:default;}
+
+  @media (max-width:600px){
+    .stats{grid-template-columns:1fr;}
+    .site-header{padding:16px 20px;}
+    .site-header nav{gap:16px; font-size:13px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="site-header">
+  <div class="mark">Our Sun... Our Health</div>
+  <nav><a href="#top">About</a><a href="#quiz">Quiz</a><a href="#game">Game</a></nav>
+</div>
+
+<div class="hero" id="top">
+  <div class="sun"></div>
+  <h1>Our Sun... Our Health</h1>
+  <p class="lede">An interactive vitamin D awareness campaign for girls aged 15-18 — learn the facts, take the quiz, and play the game.</p>
+  <div class="cta-row">
+    <a class="primary" href="#quiz">Take the quiz</a>
+    <a class="secondary" href="#game">Play the game</a>
+  </div>
+</div>
+
+<div class="stats">
+  <div class="card"><div class="icon">📉</div><div class="big">70-80%</div><div class="label">reported deficiency in some UAE studies</div></div>
+  <div class="card"><div class="icon">🦴</div><div class="big">Bones + muscles</div><div class="label">vitamin D supports both</div></div>
+  <div class="card"><div class="icon">🌞</div><div class="big">Sunlight</div><div class="label">your body's main source of vitamin D</div></div>
+</div>
+
+<section class="section-wrap" id="quiz">
+  <div class="section-head">
+    <h2>Test your knowledge</h2>
+    <p>Five random questions, pulled fresh from our question bank each time.</p>
+  </div>
+  <div class="quiz-card" id="quizCard"></div>
+</section>
+
+<section class="section-wrap" id="game">
+  <div class="section-head">
+    <h2>Roll for the floor game</h2>
+    <p>Roll the dice, then answer the question — get it right and you move that many squares on the physical board.</p>
+  </div>
+  <div class="dice-wrap">
+    <div class="die" id="die">
+      <div class="pip" id="p1"></div><div class="pip" id="p2"></div><div class="pip" id="p3"></div>
+      <div class="pip" id="p4"></div><div class="pip" id="p5"></div><div class="pip" id="p6"></div>
+      <div class="pip" id="p7"></div><div class="pip" id="p8"></div><div class="pip" id="p9"></div>
+    </div>
+    <button class="roll-btn" id="rollBtn">Roll the dice</button>
+    <div class="dice-result" id="diceResult">Tap roll to get your number.</div>
+    <div class="dice-question" id="diceQuestion" style="display:none;"></div>
+    <div class="roll-history" id="rollHistory"></div>
+  </div>
+</section>
+
+<button class="launcher" id="launcher" aria-label="Open chat">💬</button>
+
+<div class="panel" id="panel">
+  <div class="panel-head">
+    <div>
+      <div class="title">Ask Sunny</div>
+      <div class="sub">Your vitamin D question, answered</div>
+    </div>
+    <button class="panel-close" id="panelClose" aria-label="Close chat">✕</button>
+  </div>
+  <div class="messages" id="messages">
+    <div class="empty-hint">Not sure what to ask? Tap a question below 👇</div>
+  </div>
+  <div class="suggestions" id="suggestions"></div>
+  <div class="panel-input">
+    <input id="chatInput" type="text" placeholder="Ask Sunny anything…" />
+    <button id="chatSend">Send</button>
+  </div>
+</div>
+
+<script>
+  var campaignBackground = "Our Sun... Our Health — Interactive Vitamin D Awareness Campaign\n"
+    + "Audience: female students, ages 15-18, AUHS.\n\n"
+    + "What is the problem?\n"
+    + "Vitamin D deficiency is a common health concern in the UAE. Around 70-80% "
+    + "has been reported in some UAE studies, though rates differ between studies "
+    + "and age groups. Possible reasons include long hours indoors, limited outdoor "
+    + "activity, studying and screen time, hot weather, clothing that limits skin "
+    + "exposure, and low dietary intake of vitamin D.\n\n"
+    + "Why teenage girls?\n"
+    + "This age is an important time for growth and development. Vitamin D helps "
+    + "with healthy bone growth, normal muscle function, and absorbing calcium and "
+    + "phosphate. It's a good age to build healthy habits that continue into adulthood.\n\n"
+    + "What is vitamin D?\n"
+    + "It helps the body keep bones healthy, support normal muscle function, absorb "
+    + "calcium and phosphate, and support other body functions. Main sources are "
+    + "sunlight, food (eggs, salmon, fortified milk), and supplements.\n\n"
+    + "How does sunlight help make vitamin D?\n"
+    + "Sunlight (UVB rays) hits the skin, producing vitamin D3, which the body uses "
+    + "to help absorb calcium for bones.\n\n"
+    + "The campaign includes an interactive quiz, a vitamin D learning activity, a "
+    + "sunlight and UVB activity, and a giant floor snakes and ladders game where "
+    + "students throw a dice, get a number, and walk to that square themselves — "
+    + "squares are tied to vitamin D facts and habits.";
+
+  /* ---------- storage helper: uses window.storage when available, ---------- */
+  /* ---------- falls back to in-memory so the page still works elsewhere ---------- */
+  var memoryStore = {};
+  async function storeGet(key){
+    try{
+      if(window.storage){
+        var r = await window.storage.get(key, false);
+        return r ? r.value : null;
+      }
+    }catch(e){}
+    return memoryStore[key] || null;
+  }
+  async function storeSet(key, value){
+    try{
+      if(window.storage){
+        await window.storage.set(key, value, false);
+        return;
+      }
+    }catch(e){}
+    memoryStore[key] = value;
+  }
+
+  /* ================= QUIZ ================= */
+  var questionBank = [
+    {q:"What does vitamin D mainly help your body absorb?", options:["Iron and zinc","Calcium and phosphate","Sodium and potassium","Fiber"], correct:1},
+    {q:"What is the biggest natural source of vitamin D?", options:["Sunlight","Chocolate","Water","Pasta"], correct:0},
+    {q:"Which part of sunlight helps skin make vitamin D?", options:["UVA rays","Infrared rays","UVB rays","Visible light only"], correct:2},
+    {q:"Which of these is a food source of vitamin D?", options:["Salmon","Lettuce","Rice","Apples"], correct:0},
+    {q:"Vitamin D deficiency has been reported at what rate in some UAE studies?", options:["5-10%","20-30%","70-80%","almost 0%"], correct:2},
+    {q:"Why were teenage girls chosen for this campaign?", options:["They spend the least time indoors","It's a key age for growth and bone development","They eat the least food","No particular reason"], correct:1},
+    {q:"Which habit can reduce vitamin D from sunlight?", options:["Spending time outdoors","Long hours indoors and screen time","Eating salmon","Drinking fortified milk"], correct:1},
+    {q:"Vitamin D supports which body systems?", options:["Only eyesight","Only digestion","Bones and muscles","Only hair growth"], correct:2},
+    {q:"Which of these is NOT a common source of vitamin D?", options:["Sunlight","Fortified milk","Supplements","Table salt"], correct:3},
+    {q:"What can happen to vitamin D production with more skin covered by clothing?", options:["It increases","It's unaffected","It can be limited","It doubles"], correct:2},
+    {q:"What does the campaign's floor game use to decide how far you move?", options:["A spinner","A dice throw","A coin flip","A timer"], correct:1},
+    {q:"Building healthy vitamin D habits as a teen mainly helps with...", options:["Habits that carry into adulthood","Nothing long-term","Only short-term energy","Hair color"], correct:0}
+  ];
+
+  var quizState = { questions: [], index: 0, score: 0 };
+
+  function shuffle(arr){
+    var a = arr.slice();
+    for(var i = a.length - 1; i > 0; i--){
+      var j = Math.floor(Math.random() * (i+1));
+      var tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+    }
+    return a;
+  }
+
+  var quizCard = document.getElementById('quizCard');
+
+  async function renderQuizStart(){
+    var best = await storeGet('vitd-quiz-best');
+    quizCard.innerHTML =
+      '<div class="quiz-result">Ready when you are 🌞</div>' +
+      '<div class="quiz-best">' + (best ? ('Best score so far: ' + best + '/5') : 'No score saved yet') + '</div>' +
+      '<button class="quiz-start" id="quizStartBtn">Start quiz</button>';
+    document.getElementById('quizStartBtn').addEventListener('click', startQuiz);
+  }
+
+  function startQuiz(){
+    quizState.questions = shuffle(questionBank).slice(0, 5);
+    quizState.index = 0;
+    quizState.score = 0;
+    renderQuestion();
+  }
+
+  function renderQuestion(){
+    var q = quizState.questions[quizState.index];
+    var optionsHtml = q.options.map(function(opt, i){
+      return '<button data-i="' + i + '">' + opt + '</button>';
+    }).join('');
+    quizCard.innerHTML =
+      '<div class="quiz-progress">Question ' + (quizState.index + 1) + ' of 5</div>' +
+      '<div class="quiz-question">' + q.q + '</div>' +
+      '<div class="quiz-options" id="quizOptions">' + optionsHtml + '</div>';
+    var buttons = quizCard.querySelectorAll('.quiz-options button');
+    buttons.forEach(function(btn){
+      btn.addEventListener('click', function(){ answerQuestion(parseInt(btn.getAttribute('data-i'), 10)); });
+    });
+  }
+
+  function answerQuestion(choice){
+    var q = quizState.questions[quizState.index];
+    var buttons = quizCard.querySelectorAll('.quiz-options button');
+    buttons.forEach(function(btn, i){
+      btn.disabled = true;
+      if(i === q.correct) btn.classList.add('correct');
+      else if(i === choice) btn.classList.add('incorrect');
+    });
+    if(choice === q.correct) quizState.score++;
+
+    var nextBtn = document.createElement('button');
+    nextBtn.className = 'quiz-next';
+    nextBtn.textContent = (quizState.index < 4) ? 'Next question' : 'See my score';
+    nextBtn.addEventListener('click', function(){
+      quizState.index++;
+      if(quizState.index < 5) renderQuestion();
+      else finishQuiz();
+    });
+    quizCard.appendChild(nextBtn);
+  }
+
+  async function finishQuiz(){
+    var best = await storeGet('vitd-quiz-best');
+    var bestNum = best ? parseInt(best, 10) : 0;
+    if(quizState.score > bestNum){
+      await storeSet('vitd-quiz-best', String(quizState.score));
+      bestNum = quizState.score;
+    }
+    quizCard.innerHTML =
+      '<div class="quiz-result">You scored ' + quizState.score + ' / 5</div>' +
+      '<div class="quiz-best">Best score so far: ' + bestNum + '/5</div>' +
+      '<button class="quiz-start" id="quizAgainBtn">Play again</button>';
+    document.getElementById('quizAgainBtn').addEventListener('click', startQuiz);
+  }
+
+  renderQuizStart();
+
+  /* ================= DICE ================= */
+  var die = document.getElementById('die');
+  var rollBtn = document.getElementById('rollBtn');
+  var diceResult = document.getElementById('diceResult');
+  var rollHistory = document.getElementById('rollHistory');
+  var pipPositions = {
+    1:[5],
+    2:[1,9],
+    3:[1,5,9],
+    4:[1,3,7,9],
+    5:[1,3,5,7,9],
+    6:[1,3,4,6,7,9]
+  };
+  var rollsThisSession = [];
+
+  function showFace(num){
+    for(var i = 1; i <= 9; i++){
+      document.getElementById('p' + i).style.opacity = 0;
+    }
+    pipPositions[num].forEach(function(pos){
+      document.getElementById('p' + pos).style.opacity = 1;
+    });
+  }
+  showFace(1);
+
+  var diceQuestion = document.getElementById('diceQuestion');
+  var pendingRoll = null;
+
+  function askDiceQuestion(rollNum){
+    var q = questionBank[Math.floor(Math.random() * questionBank.length)];
+    diceQuestion.style.display = 'block';
+    var optionsHtml = q.options.map(function(opt, i){
+      return '<button data-i="' + i + '">' + opt + '</button>';
+    }).join('');
+    diceQuestion.innerHTML =
+      '<div class="dq-text">Answer to move ' + rollNum + ' square' + (rollNum === 1 ? '' : 's') + ': ' + q.q + '</div>' +
+      '<div class="dq-options">' + optionsHtml + '</div>' +
+      '<div class="dq-feedback" id="dqFeedback"></div>';
+    var buttons = diceQuestion.querySelectorAll('.dq-options button');
+    buttons.forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var choice = parseInt(btn.getAttribute('data-i'), 10);
+        buttons.forEach(function(b, i){
+          b.disabled = true;
+          if(i === q.correct) b.classList.add('correct');
+          else if(i === choice) b.classList.add('incorrect');
+        });
+        var feedback = document.getElementById('dqFeedback');
+        if(choice === q.correct){
+          feedback.textContent = '✅ Correct! Move ' + rollNum + ' square' + (rollNum === 1 ? '' : 's') + ' on the board.';
+          feedback.className = 'dq-feedback good';
+        }else{
+          feedback.textContent = '❌ Not quite — stay where you are this turn.';
+          feedback.className = 'dq-feedback bad';
+        }
+        rollBtn.disabled = false;
+      });
+    });
+  }
+
+  rollBtn.addEventListener('click', function(){
+    rollBtn.disabled = true;
+    diceQuestion.style.display = 'none';
+    die.classList.add('rolling');
+    diceResult.textContent = 'Rolling…';
+
+    var ticks = 0;
+    var spin = setInterval(function(){
+      showFace(Math.floor(Math.random() * 6) + 1);
+      ticks++;
+      if(ticks > 8){
+        clearInterval(spin);
+        var finalRoll = Math.floor(Math.random() * 6) + 1;
+        showFace(finalRoll);
+        die.classList.remove('rolling');
+        diceResult.textContent = 'You rolled a ' + finalRoll + ' — answer the question below to move!';
+        rollsThisSession.unshift(finalRoll);
+        if(rollsThisSession.length > 10) rollsThisSession.pop();
+        rollHistory.innerHTML = rollsThisSession.map(function(r){ return '<span>' + r + '</span>'; }).join('');
+        askDiceQuestion(finalRoll);
+      }
+    }, 80);
+  });
+
+  /* ================= CHATBOT ================= */
+  var launcher = document.getElementById('launcher');
+  var panel = document.getElementById('panel');
+  var panelClose = document.getElementById('panelClose');
+  var messagesEl = document.getElementById('messages');
+  var chatInput = document.getElementById('chatInput');
+  var chatSend = document.getElementById('chatSend');
+
+  launcher.addEventListener('click', function(){ panel.classList.add('open'); chatInput.focus(); });
+  panelClose.addEventListener('click', function(){ panel.classList.remove('open'); });
+
+  function addMessage(role, text){
+    var hint = messagesEl.querySelector('.empty-hint');
+    if(hint) hint.remove();
+    var div = document.createElement('div');
+    div.className = 'msg ' + role;
+    div.textContent = text;
+    messagesEl.appendChild(div);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+    return div;
+  }
+
+  var advancedTerms = ['calcitriol','25-hydroxyvitamin','hydroxyvitamin','osteomalacia','rickets','parathyroid','synthesis pathway','mechanism','biochemistry','metabolite','endocrine'];
+
+  var topics = [
+    { keys:['deficiency','not enough vitamin d','low vitamin d','lacking vitamin d','causes of deficiency','what causes deficiency','cause deficiency','causes deficiency','why deficiency','risk factor','how does it happen','how does deficiency happen'],
+      basic:[
+        "Vitamin D deficiency means your body doesn't have enough of it — and it's surprisingly common! It usually happens from spending lots of time indoors, screen time, hot weather, or wearing clothes that cover most of the skin.",
+        "It's when your vitamin D levels drop too low, often just from everyday habits like staying inside a lot, long screen time, or avoiding the sun in hot weather.",
+        "Basically, not getting enough vitamin D from sunlight, food, or supplements. Common reasons include indoor lifestyles, heavy skin coverage, and hot weather keeping people indoors.",
+        "It happens when your body isn't making or getting enough vitamin D over time — usually from limited sun exposure, too much time indoors, or not eating vitamin D-rich foods."
+      ],
+      detailed:["Vitamin D deficiency happens when blood levels of the active form drop below what the body needs for normal calcium absorption and bone health. Common causes include long hours indoors, limited outdoor activity, heavy sun protection or skin-covering clothing, hot weather that discourages outdoor time, screen-heavy routines, and low dietary intake of vitamin D-rich foods. Some UAE studies report deficiency rates around 70-80%, though this varies by study and age group."],
+      chips:[{type:'q', label:'What foods have vitamin D?'}, {type:'q', label:'Why is sunlight important?'}, {type:'link', label:'🎯 Try the quiz', target:'#quiz'}] },
+    { keys:['sunlight','sun exposure','how much sun','uvb','uv rays'],
+      basic:[
+        "Sunlight is your body's #1 source of vitamin D — when it hits your skin, your body makes vitamin D from it. Even a little time outdoors during the day helps! ☀️",
+        "Your skin actually makes vitamin D when sunlight touches it — that's why it's called the 'sunshine vitamin.' Just a short while outside can make a difference.",
+        "It comes mostly from UVB rays in sunlight hitting your skin. You don't need hours outside — even short, regular time in the sun adds up."
+      ],
+      detailed:["UVB rays from sunlight convert a compound in the skin into previtamin D3, which then becomes vitamin D3. Factors like time of day, season, skin coverage, and sunscreen use all affect how much your skin can produce. Balance sun exposure with skin protection, since overexposure carries its own risks."],
+      chips:[{type:'q', label:'What foods have vitamin D?'}, {type:'q', label:'Why is vitamin D important?'}, {type:'link', label:'🎲 Play the game', target:'#game'}] },
+    { keys:['where can i get vitamin d','where do i get vitamin d','where does vitamin d come from','sources of vitamin d','source of vitamin d','how do i get vitamin d','get vitamin d from','where can i find vitamin d','how can i get vitamin d','vitamin d sources','how do i get more vitamin d'],
+      basic:[
+        "You can get it three ways: sunlight (the biggest source), foods like salmon, eggs, and fortified milk, and supplements if you need extra.",
+        "Mainly from sunlight on your skin, plus smaller amounts from foods like eggs, salmon, and fortified milk — supplements can help too if you're low.",
+        "Three main sources: your skin makes it from sunlight, a few foods like salmon and eggs have some, and supplements can top it up if needed."
+      ],
+      detailed:["The three main sources are sunlight (UVB rays converting a compound in the skin into vitamin D3), diet (fatty fish, egg yolks, fortified milk or cereal), and supplements, which are often used when sunlight and diet together aren't enough."],
+      chips:[{type:'q', label:'What foods have vitamin D?'}, {type:'q', label:'Do I need a supplement?'}, {type:'link', label:'🎯 Try the quiz', target:'#quiz'}] },
+    { keys:['food','eat','diet','salmon','eggs','milk','fortified'],
+      basic:[
+        "Good food sources of vitamin D include salmon, eggs, and fortified milk. Not many foods naturally have a lot of it, which is part of why sunlight matters so much.",
+        "Salmon, egg yolks, and fortified milk are some of the best options. Food alone usually isn't enough, though — sunlight does most of the work.",
+        "Try salmon, eggs, or fortified milk and cereal. There just aren't that many naturally rich sources, so food is more of a top-up than the main supply."
+      ],
+      detailed:["Dietary sources of vitamin D include fatty fish like salmon, egg yolks, and fortified products such as milk or cereal. Because few foods are naturally rich in vitamin D, diet alone often isn't enough, which is why sunlight and sometimes supplements matter as additional sources."],
+      chips:[{type:'q', label:'Do I need a supplement?'}, {type:'q', label:'Why is vitamin D important?'}, {type:'link', label:'🎯 Try the quiz', target:'#quiz'}] },
+    { keys:['supplement','pill','tablet','dose','dosage','how much should i take'],
+      basic:[
+        "Supplements are pills or drops with vitamin D in them, used when sun and food aren't quite enough. It's best to ask a doctor or school nurse what amount is right for you.",
+        "They're a backup option — vitamin D in pill or drop form. The right amount really depends on the person, so a doctor or school nurse is the best one to ask.",
+        "Basically vitamin D you take directly, for when sunlight and food don't cover it. Skip guessing the amount — a doctor or nurse can tell you what's right for you."
+      ],
+      detailed:["Vitamin D supplements are commonly used when sunlight and diet don't provide enough. Because appropriate amounts depend on individual factors like age, existing levels, and health history, it's best to get personalized guidance from a doctor or healthcare provider rather than a general number."],
+      chips:[{type:'q', label:'What foods have vitamin D?'}, {type:'link', label:'🎯 Try the quiz', target:'#quiz'}] },
+    { keys:['bone','bones','skeleton','fracture'],
+      basic:[
+        "Vitamin D helps your body absorb calcium, which is what keeps your bones strong. Without enough, bones can become weaker over time.",
+        "It's key for bone strength — it helps calcium actually get into your bones instead of just passing through. Low levels over time can weaken bones.",
+        "Strong bones need calcium, and vitamin D is what lets your body absorb that calcium in the first place."
+      ],
+      detailed:["Vitamin D regulates calcium and phosphate absorption in the gut, which are essential minerals for bone mineralization. Chronically low vitamin D can impair this process, contributing to weaker bone density over time, especially during growth years like the teens."],
+      chips:[{type:'q', label:'Does it help my muscles too?'}, {type:'q', label:'Where do I get vitamin D?'}, {type:'link', label:'🎯 Try the quiz', target:'#quiz'}] },
+    { keys:['muscle','muscles','strength'],
+      basic:[
+        "Vitamin D also helps your muscles work normally, not just your bones.",
+        "It plays a role in muscle function too — not just bone health, which is what most people think of first.",
+        "Besides bones, it also supports how your muscles work day to day."
+      ],
+      detailed:["Vitamin D receptors are present in muscle tissue and play a role in normal muscle contraction and function. Deficiency has been associated with muscle weakness in some studies."],
+      chips:[{type:'q', label:'Does it help my bones too?'}, {type:'q', label:'Where do I get vitamin D?'}] },
+    { keys:['immune','immunity','sick less','fight infection'],
+      basic:[
+        "Vitamin D also plays a role in supporting the immune system, alongside its better-known role in bone and muscle health.",
+        "Beyond bones and muscles, it's also thought to help support your immune system.",
+        "It's not just about bones — vitamin D is linked to immune health too."
+      ],
+      detailed:["Vitamin D receptors are found on immune cells, and vitamin D is thought to play a supporting role in normal immune function, in addition to its main roles in calcium absorption and bone health."],
+      chips:[{type:'q', label:'Does it help my bones too?'}, {type:'q', label:'Where do I get vitamin D?'}] },
+    { keys:['teenage','teen girls','why girls','why teenagers','why us','why do teens need vitamin d'],
+      basic:[
+        "Teenage years are a big time for growth, so vitamin D matters a lot for building strong bones now and setting up healthy habits for later.",
+        "This is a key growth stage, so getting enough vitamin D now helps build strong bones that last into adulthood.",
+        "Bones grow the most during these years, so it's a great time to build good vitamin D habits that stick with you later."
+      ],
+      detailed:["Adolescence is a critical window for peak bone mass accumulation, so adequate vitamin D during these years supports long-term skeletal health. This age group was chosen for the campaign because habits formed now, like sun exposure and diet choices, tend to carry into adulthood."],
+      chips:[{type:'q', label:'How do I get more vitamin D?'}, {type:'link', label:'🎲 Play the game', target:'#game'}] },
+    { keys:['symptom','symptoms','tired','fatigue','sign of deficiency'],
+      basic:[
+        "Some people with low vitamin D feel more tired than usual, or get achy bones or muscles. But often there are no clear signs at all — a blood test is the only way to know for sure.",
+        "It can show up as extra tiredness or achy bones and muscles, though a lot of the time there are no obvious symptoms — testing is the only sure way to check.",
+        "Fatigue and bone or muscle aches are common signs, but many people don't notice anything at all. A blood test is really the only reliable way to know."
+      ],
+      detailed:["Vitamin D deficiency symptoms can be nonspecific — fatigue, bone pain, or muscle weakness — and many people have no obvious symptoms at all. Because of this, blood testing (typically measuring 25-hydroxyvitamin D) is the reliable way to confirm levels rather than relying on symptoms alone."],
+      chips:[{type:'q', label:'How do I get more vitamin D?'}, {type:'link', label:'🎯 Try the quiz', target:'#quiz'}] },
+    { keys:['quiz'],
+      basic:[
+        "The quiz above has 5 random questions pulled from a bigger question bank each time you play — scroll up and give it a go!",
+        "Scroll up to try the quiz — it picks 5 random questions from a bigger bank every time, so it's a little different each round."
+      ],
+      detailed:["The quiz section randomly selects 5 questions from a bank of 12 each time you start it, tracks your score out of 5, and saves your best score so you can try to beat it."],
+      chips:[{type:'link', label:'🎯 Take me to the quiz', target:'#quiz'}, {type:'q', label:'What is vitamin D?'}] },
+    { keys:['game','floor game','snakes and ladders','dice'],
+      basic:[
+        "The dice roller on this page is for the real floor game — roll it, answer the question that comes up, and if you get it right you move that many squares on the physical board!",
+        "Use the dice above for the floor game — roll, answer the question, and a correct answer lets you move that many squares on the real board."
+      ],
+      detailed:["Since the actual snakes-and-ladders board is played on the floor, this page gives you a dice to roll — tap it to get a random 1-6, then answer the vitamin D question that appears. Answer correctly and you move that many squares on the real board; the last several rolls are shown so a group can keep track of turns."],
+      chips:[{type:'link', label:'🎲 Take me to the game', target:'#game'}, {type:'q', label:'What is vitamin D?'}] },
+    { keys:['what is vitamin d','vitamin d is','define vitamin d','why do we need vitamin d','why do i need vitamin d','why is vitamin d important','importance of vitamin d','why do we need it','why do i need it','what does vitamin d do','why is it important','is it important','important','why do we need','why do i need','is vitamin d important'],
+      basic:[
+        "Vitamin D helps your body use calcium to build strong bones and muscles. You get most of it from sunlight, plus some from foods like eggs, salmon, and fortified milk.",
+        "It's a nutrient that helps your body absorb calcium, which is what keeps bones and muscles strong. Sunlight is the main way you get it, with a bit more from foods like salmon and eggs.",
+        "Think of it as a helper that lets your body actually use the calcium you eat — without it, your bones and muscles can't grow as strong. Sunlight makes most of it for you.",
+        "We need it because it lets our bodies absorb calcium properly — without enough, bones and muscles don't grow or work as well as they should."
+      ],
+      detailed:["Vitamin D is a fat-soluble nutrient that helps the body absorb calcium and phosphate. It's produced in the skin when UVB rays from sunlight hit it, converting a precursor into vitamin D3, which the liver and kidneys then process into its active form so the body can use it for bone mineralization, muscle function, and other processes. We need it because without enough of it, the body can't absorb calcium properly, which weakens bones and muscles over time and can affect other body functions."],
+      chips:[{type:'q', label:'Where do I get vitamin D?'}, {type:'q', label:'Why do teens need vitamin D?'}, {type:'link', label:'🎯 Try the quiz', target:'#quiz'}] },
+    { keys:['campaign','about this','purpose','why this campaign'],
+      basic:[
+        "This campaign, Our Sun... Our Health, teaches teenage girls about vitamin D through a quiz, a floor game, and this chatbot — because deficiency is common but easy to learn about and prevent.",
+        "It's called Our Sun... Our Health — a campaign using a quiz, a floor game, and me (Sunny!) to teach students about vitamin D and why it matters."
+      ],
+      detailed:["The campaign targets female students aged 15-18 given reported deficiency rates of 70-80% in some UAE studies. It combines a quiz, a learning activity, a sunlight/UVB activity, and a giant floor snakes-and-ladders game to make vitamin D education interactive rather than just informational."],
+      chips:[{type:'q', label:'What is vitamin D?'}, {type:'link', label:'🎯 Try the quiz', target:'#quiz'}, {type:'link', label:'🎲 Play the game', target:'#game'}] },
+    { keys:['hi','hello','hey','hii','heyy'],
+      basic:["Hi! I'm Sunny 🌞 Ask me anything about vitamin D, or about the quiz and game on this page."],
+      detailed:["Hi! I'm Sunny 🌞 Ask me anything about vitamin D, or about the quiz and game on this page."] },
+    { keys:['thank','thanks','thx'],
+      basic:["You're welcome! Ask me anything else about vitamin D anytime.", "Anytime! Come back if you think of another question."],
+      detailed:["You're welcome! Ask me anything else about vitamin D anytime."] }
+  ];
+
+  function scoreMatch(message, keys){
+    var hits = 0;
+    keys.forEach(function(k){ if(message.indexOf(k) !== -1) hits++; });
+    return hits;
+  }
+
+  function pickVariant(list, topic, tier){
+    if(list.length === 1) return list[0];
+    var lastKey = '_last_' + tier;
+    var idx;
+    do{
+      idx = Math.floor(Math.random() * list.length);
+    }while(idx === topic[lastKey]);
+    topic[lastKey] = idx;
+    return list[idx];
+  }
+
+  var fallbackAnswers = [
+    "Vitamin D helps keep your bones and muscles strong, and your body makes most of it from sunlight, with some coming from foods like salmon, eggs, and fortified milk. Deficiency means not getting enough of it, often from too much time indoors or covering up a lot of skin. Ask me about sources, symptoms, or why it matters for you specifically!",
+    "It's a nutrient your body needs for strong bones and muscles, made mostly from sunlight and topped up by foods like salmon and eggs. Not getting enough is called deficiency, and it's pretty common. Try asking about sources, symptoms, or the game and quiz here!",
+    "Vitamin D supports your bones, muscles, and even your immune system, and comes mainly from sunlight plus a bit from food. Low levels (deficiency) are common, especially with lots of indoor time. Ask me something more specific and I'll dig in!"
+  ];
+  var lastFallbackIdx = -1;
+
+  function answerFor(text){
+    var message = text.toLowerCase();
+    var isDetailed = /detail|explain more|in depth|technical|why exactly|mechanism/.test(message)
+      || advancedTerms.some(function(t){ return message.indexOf(t) !== -1; });
+
+    var best = null, bestScore = 0;
+    topics.forEach(function(topic){
+      var s = scoreMatch(message, topic.keys);
+      if(s > bestScore){ bestScore = s; best = topic; }
+    });
+
+    if(best){
+      var tier = isDetailed ? 'detailed' : 'basic';
+      return { reply: pickVariant(best[tier], best, tier), topic: best };
+    }
+
+    var idx;
+    do{
+      idx = Math.floor(Math.random() * fallbackAnswers.length);
+    }while(idx === lastFallbackIdx && fallbackAnswers.length > 1);
+    lastFallbackIdx = idx;
+    return { reply: fallbackAnswers[idx], topic: null };
+  }
+
+  /* ---------- suggestion chips ---------- */
+  var suggestionsEl = document.getElementById('suggestions');
+  var starterChipDefs = [
+    { type:'q', label:'What is vitamin D?' },
+    { type:'q', label:'Where do I get vitamin D?' },
+    { type:'q', label:'Why is vitamin D important?' },
+    { type:'link', label:'🎯 Try the quiz', target:'#quiz' },
+    { type:'link', label:'🎲 Play the game', target:'#game' }
+  ];
+
+  function renderChips(list){
+    suggestionsEl.innerHTML = '';
+    (list || []).forEach(function(item){
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'chip' + (item.type === 'link' ? ' link-chip' : '');
+      btn.textContent = item.label;
+      btn.addEventListener('click', function(){
+        if(item.type === 'link'){
+          var el = document.querySelector(item.target);
+          if(el) el.scrollIntoView({ behavior:'smooth', block:'start' });
+        } else {
+          sendMessage(item.label);
+        }
+      });
+      suggestionsEl.appendChild(btn);
+    });
+  }
+
+  function sendMessage(forcedText){
+    var fromChip = typeof forcedText === 'string';
+    var text = (fromChip ? forcedText : chatInput.value).trim();
+    if(!text) return;
+    if(!fromChip) chatInput.value = '';
+    chatSend.disabled = true;
+    renderChips([]);
+    addMessage('user', text);
+    var pending = addMessage('bot pending', 'Thinking…');
+
+    setTimeout(function(){
+      var result = answerFor(text);
+      pending.textContent = result.reply;
+      pending.classList.remove('pending');
+      chatSend.disabled = false;
+      chatInput.focus();
+      renderChips(result.topic && result.topic.chips ? result.topic.chips : starterChipDefs);
+    }, 400);
+  }
+
+  chatSend.addEventListener('click', function(){ sendMessage(); });
+  chatInput.addEventListener('keydown', function(e){ if(e.key === 'Enter') sendMessage(); });
+
+  renderChips(starterChipDefs);
+</script>
+
+</body>
+</html>
